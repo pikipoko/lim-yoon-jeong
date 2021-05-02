@@ -1,28 +1,28 @@
 // express 서버를 위한 모듈
-var express = require('express');
-var http = require('http');
-var static = require('serve-static');
-var path = require('path');
+const express = require('express');
+const http = require('http');
+const static = require('serve-static');
+const path = require('path');
 
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var expressSession = require('express-session');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const expressSession = require('express-session');
 
-var cors = require('cors');
+const cors = require('cors');
 
-var expressErroHandler = require('express-error-handler');
+const expressErroHandler = require('express-error-handler');
 
-var config = require('./config/config');
+const config = require('./config/config');
 
 //var database_loader = require('./database/database_loader');
-var route_loader = require('./router/router_loader');
+const route_loader = require('./router/router_loader');
 
 //===== Passport 사용 =====//
 //var passport = require('passport');
 //var flash = require('connect-flash');
 
 // 서버 객체
-var app = express(); 
+const app = express(); 
 
 // 뷰 관련 설정
 app.set('views', __dirname + '/views');
@@ -53,7 +53,7 @@ app.use(cors());
 //app.use(passport.session());
 //app.use(flash());
 
-var router = express.Router();
+const router = express.Router();
 route_loader.init(app, router);
 
 // passport 설정
@@ -65,7 +65,7 @@ route_loader.init(app, router);
 //userPassport(app, passport);
 
 // 등록된 라우터 패스가 없는 경우
-var errorHandler = expressErroHandler({
+const errorHandler = expressErroHandler({
     static: {
         '404': './public/404.html'
     }
@@ -75,7 +75,7 @@ var errorHandler = expressErroHandler({
 app.use(expressErroHandler.httpError(404));
 app.use(errorHandler);
 
-var server = http.createServer(app).listen(app.get('port'), function() {    
+const server = http.createServer(app).listen(app.get('port'), function() {    
     console.log('익스프레스로 웹 서버를 실행함 : ' + app.get('port'));
     
     //database_loader.init(app, config);

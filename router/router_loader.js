@@ -1,8 +1,8 @@
 
 
-var route_loader = {};
+const route_loader = {};
 
-var config = require('../config/config');
+const config = require('../config/config');
 
 route_loader.init = function(app, router) {
     console.log('route_loader.init 호출됨.');
@@ -13,10 +13,10 @@ route_loader.init = function(app, router) {
 function initRouters(app, router) {
     console.log('initRoutes 호출됨.');
     
-    for (var i=0; i<config.route_info.length; i++) {
-        var curItem = config.route_info[i];
+    for (let i=0; i<config.route_info.length; i++) {
+        let curItem = config.route_info[i];
         
-        var curModule = require(curItem.file);
+        let curModule = require(curItem.file);
         if(curItem.type == 'get') {
             router.route(curItem.path).get(curModule[curItem.method]);
         } else if (curItem.type == 'post') {
