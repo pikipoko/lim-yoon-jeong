@@ -1,6 +1,6 @@
 
 
-const submit = function(req, res) {
+const submit = (req, res) => {
     console.log('/process/submit으로 POST 요청됨.');
 }
 

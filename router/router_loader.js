@@ -4,7 +4,7 @@ const route_loader = {};
 
 const config = require('../config/config');
 
-route_loader.init = function(app, router) {
+route_loader.init = (app, router) => {
     console.log('route_loader.init 호출됨.');
     
     initRouters(app, router);
