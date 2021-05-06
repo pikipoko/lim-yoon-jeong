@@ -10,7 +10,7 @@ const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
 const listAll = (req, res) => {
     console.log('/process/listAll으로 POST 요청됨.');
-    
+
     contract.methods.getAllHistories().call()
         .then(histories => {
             console.log("histories: " + histories);
@@ -36,7 +36,7 @@ const submit = async (req, res) => {
     const contractFunction = contract.methods.addProStru(parseInt(historyNumber) + 1, userCode, userName);
     const functionAbi = contractFunction.encodeABI();
 
-    web3.eth.getTransactionCount(account).then(_nonce => {
+    web3.eth.getTransactionCount(account, "pending").then(_nonce => {
         const txParams = {
             nonce: web3.utils.toHex(_nonce),
             gasPrice: web3.utils.toHex(web3.utils.toWei('4', 'gwei')),
