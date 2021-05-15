@@ -1,11 +1,15 @@
-import cv2
 import face_recognition
 import pickle
 import time
 import dlib
 import numpy as np
+import cv2
+import socketio
 
-encoding_file = 'lib/encodings.pickle'
+sio = socketio.Client()
+sio.connect('http://127.0.0.1:3300')
+
+encoding_file = 'encodings.pickle'
 unknown_name = 'Unknown'
 # Either cnn  or hog. The CNN method is more accurate but slower. HOG is faster but less accurate.
 model_method = 'cnn'
@@ -14,7 +18,7 @@ RIGHT_EYE = list(range(36, 42))
 LEFT_EYE = list(range(42, 48))
 EYES = list(range(36, 48))
 
-predictor_file = 'lib/model/shape_predictor_68_face_landmarks.dat'
+predictor_file = './model/shape_predictor_68_face_landmarks.dat'
 MARGIN_RATIO = 1.5
 OUTPUT_SIZE = (300, 300)
 
@@ -22,7 +26,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(predictor_file)
 
 
-#사진 짜르기 메소드
+# 사진 짜르기 메소드
 def getFaceDimension(rect):
     return (rect.left(), rect.top(), rect.right() - rect.left(), rect.bottom() - rect.top())
 
@@ -38,7 +42,7 @@ def getCropDimension(rect, center):
     return (startX, endX, startY, endY)
 
 
-#얼굴인식후 표시 메소드
+# 얼굴인식후 표시 메소드
 def detectAndDisplay(image):
     global name
     unknown_check = False
@@ -69,16 +73,12 @@ def detectAndDisplay(image):
         distance = face_recognition.face_distance(data["encodings"], encoding)
 
         distance_bool = []
-        print(distance)
-
 
         for i in distance:
             if i < 0.42:
                 distance_bool.append(True)
             else:
                 distance_bool.append(False)
-
-        print(distance_bool)
 
         # check to see if we have found a match
         if True in distance_bool:
@@ -104,11 +104,8 @@ def detectAndDisplay(image):
         if unknown_check == False:
             names.append("unknown_name")
         else:
-            print(1)
             names.append(name)
         print(names)
-
-
 
     # loop over the recognized faces
     for ((top, right, bottom, left), name) in zip(boxes, names):
@@ -127,17 +124,23 @@ def detectAndDisplay(image):
                     0.75, color, line)
     end_time = time.time()
     process_time = end_time - start_time
-    print("=== A frame took {:.3f} seconds".format(process_time))
+    # print("=== A frame took {:.3f} seconds".format(process_time))
     # show the output image
+
     cv2.imshow("Recognition", image)
 
-    print(name, time.localtime())
+    Date = str(time.localtime().tm_year) + "-" + str(time.localtime().tm_mon) + "-" + str(
+        time.localtime().tm_mday) + "-" + str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min)
+    print(name, Date)
+
+    if name != '':
+        # 소켓 서버에 인증 결과 전송
+        sio.emit('streaming', name)
+        time.sleep(0.5)
 
 
 # load the known faces and embeddings
 data = pickle.loads(open(encoding_file, "rb").read())
-
-
 
 cap = cv2.VideoCapture(0)
 
@@ -145,19 +148,13 @@ while True:
 
     success, image = cap.read()
 
-    if not success:
-        print("fail!!!")
-        break
-
     # image_origin = image.copy()
     try:
         image_origin = image[100:401, 170:451].copy()
     except Exception as e:
         print(str(e))
 
-    cv2.imshow("2", image_origin)
-
-    cv2.rectangle(image,(170,100),(450,400),(0,255,255),1)
+    cv2.rectangle(image, (170, 100), (450, 400), (0, 255, 255), 1)
 
     (image_height, image_width) = image_origin.shape[:2]
     gray = cv2.cvtColor(image_origin, cv2.COLOR_BGR2GRAY)
@@ -168,23 +165,18 @@ while True:
         print('--(!) No captured image -- Break!')
         # close the video file pointers
 
-
         cap.release()
         # close the writer point
         break
 
-
-    #카메라 화면
+    # 카메라 화면
     cv2.imshow("", image)
-
-
-
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    #Input Data 전처리
+    # Input Data 전처리
     for (i, rect) in enumerate(rects):
         (x, y, w, h) = getFaceDimension(rect)
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -219,13 +211,10 @@ while True:
                        (left_eye_center[0, 1] + right_eye_center[0, 1]) // 2)
         # cv2.circle(image, eyes_center, 5, (255, 0, 0), -1)
 
-        print(eyes_center, degree, scale)
-        #metrix = cv2.getRotationMatrix2D(eyes_center, degree, scale)
-        #print(metrix)
+        metrix = cv2.getRotationMatrix2D(eyes_center, degree, scale)
         cv2.putText(image, "{:.5f}".format(degree), (right_eye_center[0, 0], right_eye_center[0, 1] + 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
-        metrix = np.float32([[1, 0, 50], [0, 1, 10]])
         warped = cv2.warpAffine(image_origin, metrix, (image_width, image_height),
                                 flags=cv2.INTER_CUBIC)
 
@@ -237,7 +226,7 @@ while True:
         except Exception as e:
             print(str(e))
 
-        #전처리한 Input Data 얼굴인식
+        # 전처리한 Input Data 얼굴인식
         try:
             detectAndDisplay(output)
         except Exception as e:
@@ -247,7 +236,7 @@ while True:
             x = point[0, 0]
             y = point[0, 1]
             cv2.circle(image, (x, y), 1, (0, 255, 255), -1)
-    time.sleep(0.2)
-
+    time.sleep(0.3)
 
 cv2.destroyAllWindows()
+sio.disconnect()

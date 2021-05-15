@@ -17,6 +17,9 @@ const config = require('./config/config');
 //var database_loader = require('./database/database_loader');
 const route_loader = require('./router/router_loader');
 
+// 소켓 통신으로 받은 데이터를 블록체인에 저장하기 위한 모듈
+const attendance = require('./router/attendance');
+
 //===== Passport 사용 =====//
 //var passport = require('passport');
 //var flash = require('connect-flash');
@@ -57,7 +60,7 @@ const router = express.Router();
 route_loader.init(app, router);
 
 // passport 설정
-//var configPassport = require('./config/passport');
+//var configPassport = require('./config/configPassport');
 //configPassport(app, passport);
 
 // passport 관련 함수 라우팅
@@ -80,3 +83,13 @@ const server = http.createServer(app).listen(app.get('port'), function() {
     
     //database_loader.init(app, config);
 });
+
+// socket 서버 실행
+const socketio = require('socket.io')(server);
+socketio.sockets.on('connection', (socket) => {
+    socket.on('streaming', (data) => {
+		console.log(data);
+        attendance.send(data);
+	});
+});
+console.log('소켓 서버 실행 완료.');
