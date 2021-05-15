@@ -81,5 +81,15 @@ const getHistoriesNumber = async () => {
     return result;
 }
 
+const test = {};
+
+test.send = (data) => {
+    console.log('test.send 호출됨.');
+    
+    console.log('test');
+}
+
+module.exports = test;
+
 module.exports.listAll = listAll;
 module.exports.submit = submit;
