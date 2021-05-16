@@ -86,7 +86,7 @@ const test = {};
 test.send = (data) => {
     console.log('test.send 호출됨.');
     
-    console.log('test');
+    console.log(data);
 }
 
 module.exports = test;
