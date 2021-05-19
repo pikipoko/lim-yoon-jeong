@@ -1,13 +1,14 @@
 
 
-const scanner = (req, res) => {
+const index = (req, res) => {
     console.log('/ 패스로 GET 요청됨.');
 
+    res.redirect('/public/index.html');
     //res.render('scanner');
-    res.render('attendanceTest');//테스트 중
+    //res.render('attendanceTest');//테스트 중
     //res.render('faceRecognitionTest');
     //res.render('test');
     //res.render('testByOpencv');
 }
 
-module.exports.scanner = scanner;
+module.exports.index = index;
