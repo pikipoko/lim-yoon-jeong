@@ -11,20 +11,30 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
     });
 
     router.route('/login').post(passport.authenticate('local-login', {       
-        successRedirect: '/public/index.html',
-        failureRedirect: '/login',
+        successRedirect: '/user',
+        failureRedirect: '/public/login.html',
         failureFlash: true
     }));
     
-    router.route('/signup').get((req, res) => {
-        console.log('/signup 패스로 GET 요청됨.');
+    router.route('/admin/list/signup').get((req, res) => {
+        console.log('/admin/list/signup 패스로 GET 요청됨.');
 
-        res.redirect('/public/signup.html');
+        const adminSession = req.session.admin;
+        if (adminSession) {
+            console.log('관리자 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('관리자 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+        res.render('signup.ejs');
+        return;
     });
 
-    router.route('/signup').post(passport.authenticate('local-signup', {
-        successRedirect: '/public/index.html',
-        failureRedirect: '/signup',
+    router.route('/admin/list/signup').post(passport.authenticate('local-signup', {
+        successRedirect: '/admin/list',
+        failureRedirect: '/admin/list/signup',
         failureFlash: true
     }));
 
@@ -34,4 +44,10 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
         req.logout(); // req.user에 들어있는 로그인 세션 삭제
         res.redirect('/');
     });
+
+    router.route('/user').get((req, res) => {
+        console.log('/user 패스로 GET 요청됨.');
+
+        res.render('user.ejs');
+    })
 }

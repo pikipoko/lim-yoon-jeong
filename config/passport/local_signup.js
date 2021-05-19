@@ -4,15 +4,16 @@ const crypto = require('crypto');
 
 module.exports = new LocalStrategy({
     // 각 필드로 어떤 속성이 들어오는지 명시적으로 지정해주기(안해도 되지만)
-    usernameField:'email',
+    usernameField:'name',
     passwordField:'password',
     passReqToCallback: true
-}, (req, email, password, done) => {
+}, (req, name, password, done) => {
     const paramCode = req.body.code || req.query.code;
-    console.log('passport의 local-signup 호출됨 : ' + email + ', ' + password + ', ' + paramCode);
+    const paramDepartment = req.body.department || req.query.department;
+    console.log('passport의 local-signup 호출됨 : ' + paramCode + ', ' + name + ', ' + password + ', ' + paramDepartment);
     
     const database = req.app.get('database');
-    addUser(email, password, paramCode, database.pool, (err, result) => {
+    addUser(paramCode, name, password, paramDepartment, database.pool, (err, result) => {
         if (err) {
             console.log('사용자 추가 중 오류 발생.');
             return done(err);
@@ -26,7 +27,7 @@ module.exports = new LocalStrategy({
     });
 });
 
-const addUser = (email, password, code, pool, callback) => {
+const addUser = (code, name, password, department, pool, callback) => {
     console.log('addUser 함수 호출됨.');
 
     pool.getConnection((err, conn) => {
@@ -40,13 +41,13 @@ const addUser = (email, password, code, pool, callback) => {
 
         salt = makeSalt();
         const data = {
-            email: email,
+            code: code,
+            name: name,
             hashed_password: encryptPassword(password, salt),
             salt: salt,
-            code: code
+            department: department,
         };
 
-        console.log(data.hashed_password);
         const exec = conn.query('insert into users set ?', data, (err, result) => {
             conn.release();
             

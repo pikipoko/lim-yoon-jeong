@@ -11,7 +11,7 @@ module.exports = (app, passport) => {
         console.log('serializeUser 호출됨.');
         console.log(user);
     
-        done(null, user.email);
+        done(null, user);
     });
 
     // 인증이 아니라 다른 요청들에서 다른 확인 작업을 하고 싶은 경우

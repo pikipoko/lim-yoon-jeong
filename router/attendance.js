@@ -11,17 +11,24 @@ const contract = new web3.eth.Contract(contractAbi, contractAddress);
 const listAll = (req, res) => {
     console.log('/process/listAll으로 POST 요청됨.');
 
-    contract.methods.getAllHistories().call()
+    getHistoryAll();
+}
+
+const getHistoryAll = async () => {
+    let response;
+    await contract.methods.getAllHistories().call()
         .then(histories => {
-            console.log("histories: " + histories);
-            var response = {
+            //console.log("histories: " + histories);
+            response = {
                 'result': 'true',
                 'getLists': histories
             }
 
-            console.log('response : ' + response);
-            //res.status(200).json(response);
+            //console.log('response : ' + response.getLists[0].userCode);
+            //return response;
         });
+    
+        return response;
 }
 
 const submit = async (req, res) => {
@@ -57,7 +64,7 @@ const submit = async (req, res) => {
                     .then(length => {
                         console.log("getNumOfHistories: " + length)
                     })
-                var response = {
+                const response = {
                     'result': 'true',
                     'blockHash': receipt.blockHash,
                     'transactionHash': receipt.transactionHash,
@@ -93,3 +100,4 @@ module.exports = test;
 
 module.exports.listAll = listAll;
 module.exports.submit = submit;
+module.exports.getHistoryAll = getHistoryAll;
