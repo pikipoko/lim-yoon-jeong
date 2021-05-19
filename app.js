@@ -4,7 +4,6 @@ const http = require('http');
 const static = require('serve-static');
 const path = require('path');
 
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 
