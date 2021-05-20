@@ -88,6 +88,7 @@ const list = (req, res) => {
     })
 }
 
+/*
 const show = (req, res) => {
     console.log('admin/show 패스로 GET 요청됨.');
 
@@ -152,6 +153,63 @@ const showHistory = async (req, res) => {
         res.end();
     }    
 }
+*/
+
+const show = async (req, res) => {
+    console.log('admin/list/show 패스로 GET 요청됨.');
+
+    const adminSession = req.session.admin;
+    console.log(adminSession);
+    //const session = req.session.passport; -> 이거는 유저 페이지에 조회 시 사용..
+    if (adminSession) {
+        console.log('관리자 로그인 정보가 있습니다.');
+    }
+    else {
+        console.log('관리자 로그인 정보가 없습니다.');
+        res.redirect('/public/login.html');
+        return;
+    }
+    
+    const userCode = req.params.userCode;
+    const response = await attendance.getHistory(userCode);
+    console.log(response);
+    if (response.result) {
+        console.log(response.getList);
+        const context = {
+            userCode: userCode,
+            results: response.getList
+        };
+        req.app.render('show', context, function(err, html) {
+            if(err) {
+                console.error('뷰 렌더링 중 에러 발생 : ' + err.stack);
+                console.log('에러 발생.');
+
+                res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+                res.write('<h1>뷰 렌더링 중 에러 발생</h1>');
+                res.write('<br><p>' + err.stack + '<p>');
+                res.end();
+                return;
+            }
+        
+            res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+            res.end(html);
+        });              
+    } else {
+        console.log('에러 발생.');
+        res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+        res.write('<h1>검색 실패.</h1>');
+        res.end();
+    }    
+}
+
+const showHistory = async (req, res) => {
+    console.log('admin/list/show 패스로 POST 요청됨.');
+
+    const response = await attendance.getHistoryAll();
+    res.send(response.getLists);
+    return;
+}
+
 
 module.exports.adminLogin = adminLogin;
 module.exports.list = list;
