@@ -10,90 +10,6 @@
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "histories",
-		"outputs": [
-			{
-				"name": "historyNumber",
-				"type": "uint256"
-			},
-			{
-				"name": "userCode",
-				"type": "string"
-			},
-			{
-				"name": "userName",
-				"type": "string"
-			},
-			{
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "getHistoryStruct",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "historyNumber",
-				"type": "uint256"
-			},
-			{
-				"name": "userCode",
-				"type": "string"
-			},
-			{
-				"name": "userName",
-				"type": "string"
-			}
-		],
-		"name": "addProStru",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
 		"inputs": [],
 		"name": "getNumOfHistories",
 		"outputs": [
@@ -108,34 +24,35 @@
 	},
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "getAllHistories",
+		"inputs": [
+			{
+				"name": "userCode",
+				"type": "string"
+			}
+		],
+		"name": "getHistory",
 		"outputs": [
 			{
-				"components": [
-					{
-						"name": "historyNumber",
-						"type": "uint256"
-					},
-					{
-						"name": "userCode",
-						"type": "string"
-					},
-					{
-						"name": "userName",
-						"type": "string"
-					},
-					{
-						"name": "timestamp",
-						"type": "uint256"
-					}
-				],
 				"name": "",
-				"type": "tuple[]"
+				"type": "uint256[]"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "userCode",
+				"type": "string"
+			}
+		],
+		"name": "addHistory",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

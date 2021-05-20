@@ -8,24 +8,23 @@ const web3 = new Web3('https://ropsten.infura.io/v3/3c52917848e945229c0d33d632b1
 const privateKey = Buffer.from(etherConfig.privateKey, 'hex');
 const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
-const listAll = (req, res) => {
-    console.log('/process/listAll으로 POST 요청됨.');
+const list = (req, res) => {
+    console.log('/process/list로 POST 요청됨.');
 
-    getHistoryAll();
+    const userCode = req.body.userCode;
+    const history = getHistory(userCode);
+    console.log(history);
 }
 
-const getHistoryAll = async () => {
+const getHistory = async (userCode) => {
     let response;
-    await contract.methods.getAllHistories().call()
-        .then(histories => {
-            //console.log("histories: " + histories);
+    await contract.methods.getHistory(userCode).call()
+        .then(history => {
+            console.log("history: " + history);
             response = {
                 'result': 'true',
-                'getLists': histories
+                'getList': history
             }
-
-            //console.log('response : ' + response.getLists[0].userCode);
-            //return response;
         });
     
         return response;
@@ -35,12 +34,11 @@ const submit = async (req, res) => {
     console.log('/process/submit으로 POST 요청됨.');
 
     const userCode = req.body.userCode;
-    const userName = req.body.userName;
-    console.log(userCode + " : " + userName);
+    console.log("userCode : " + userCode);
 
     let historyNumber = await getHistoriesNumber();
-    console.log(historyNumber + " -> " + userCode + " : " + userName);
-    const contractFunction = contract.methods.addProStru(parseInt(historyNumber) + 1, userCode, userName);
+    console.log(historyNumber + " -> " + userCode);
+    const contractFunction = contract.methods.addHistory(userCode);
     const functionAbi = contractFunction.encodeABI();
 
     web3.eth.getTransactionCount(account, "pending").then(_nonce => {
@@ -98,6 +96,6 @@ test.send = (data) => {
 
 module.exports = test;
 
-module.exports.listAll = listAll;
+module.exports.list = list;
 module.exports.submit = submit;
-module.exports.getHistoryAll = getHistoryAll;
+module.exports.getHistory = getHistory;
