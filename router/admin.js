@@ -11,7 +11,7 @@ const adminLogin = (req, res) => {
             req.session.admin = {
                 id: config.admin_id
             }
-            res.render('program.ejs');
+            res.redirect('/admin');
             return;
         }
     }
@@ -19,12 +19,26 @@ const adminLogin = (req, res) => {
     res.redirect('/public/login.html');
 }
 
+const admin = (req, res) => {
+    const adminSession = req.session.admin;
+    console.log(adminSession);
+    if (adminSession) {
+        console.log('관리자 로그인 정보가 있습니다.');
+    }
+    else {
+        console.log('관리자 로그인 정보가 없습니다.');
+        res.redirect('/public/login.html');
+        return;
+    }
+
+    res.render('program');
+}
+
 const list = (req, res) => {
     console.log('admin/list 패스로 GET 요청됨.');
 
     const adminSession = req.session.admin;
     console.log(adminSession);
-    //const session = req.session.passport; -> 이거는 유저 페이지에 조회 시 사용..
     if (adminSession) {
         console.log('관리자 로그인 정보가 있습니다.');
     }
@@ -210,8 +224,8 @@ const showHistory = async (req, res) => {
     return;
 }
 
-
 module.exports.adminLogin = adminLogin;
+module.exports.admin = admin;
 module.exports.list = list;
 module.exports.show = show;
 module.exports.showHistory = showHistory;
