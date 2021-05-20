@@ -100,16 +100,16 @@
                             <tbody>
                                 <%
                                     for(let i = 0; i<results.length; i++) {
-                                        let id = results[i].code;
-                                        let name = results[i].name;
-                                        let code = results[i].department;
-                                        
+                                        const code = results[i].code;
+                                        const name = results[i].name;
+                                        const department = results[i].department;
+                                        const url = "/admin/list/show/" + code
                                 %>
-                                <tr>
+                                <tr onClick ="location.href='<%=url%>'"> 
                                     <td><%= i+1%></td>
-                                    <td style="vertical-align: middle;"><%= id%></td>
-                                    <td style="vertical-align: middle;"><%= name%></td>
                                     <td style="vertical-align: middle;"><%= code%></td>
+                                    <td style="vertical-align: middle;"><%= name%></td>
+                                    <td style="vertical-align: middle;"><%= department%></td>
                                 </tr>
                                 <%
                                     }
@@ -149,7 +149,7 @@
 
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
     </script>
     <script src="../public/js/scripts.js"></script>

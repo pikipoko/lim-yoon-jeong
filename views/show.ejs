@@ -8,8 +8,8 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>관리자 페이지</title>
-    <link href="../public/css/program.css" rel="stylesheet" />
-    <link rel="icon" href="../public/img/admin.png">
+    <link href="/public/css/program.css" rel="stylesheet" />
+    <link rel="icon" href="/public/img/admin.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous">
     </script>
 </head>
@@ -83,7 +83,7 @@
             <main>
                 <div class="container-fluid">
                     <div class="flex">
-                        <h3 class="mt-4"><strong>전체 인증이력</strong></h3>
+                        <h3 class="mt-4"><strong>개인 인증이력</strong></h3>
                         <form action="#">
                             <!-- <form action="#">
                             <input id="input-tag" type="button" value="일별" class="btn-secondary">
@@ -154,7 +154,19 @@
                                     <td class="td-metable">날짜</td>
                                 </tr>
                             </thead>
-                            <tbody id="transaction">
+                            <tbody>
+                                <%
+                                    for(let i = 0; i<results.length; i++) {
+                                        const timestamp = new Date(results[i] * 1000);
+                                %>
+                                <tr>
+                                    <td><%= i+1%></td>
+                                    <td><%= userCode%></td>
+                                    <td style="vertical-align: middle;"><%= timestamp%></td>
+                                </tr>
+                                <%
+                                    }
+                                %>
                             </tbody>
                         </table>
                     </div>
@@ -193,27 +205,11 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
     </script>
-    <script src="../public/js/scripts.js"></script>
+    <script src="/public/js/scripts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
     <script src="assets/demo/chart-area-demo.js"></script>
     <script src="assets/demo/chart-bar-demo.js"></script>
     <script src="assets/demo/chart-pie-demo.js"></script>
-    <script>  
-        $.ajax({
-            url:'/admin/show',
-            type : 'POST',
-            success:function(results){
-                for(let i=0; i<results.length; i++) {
-                    let code = results[i][1];
-                    let timestamp = new Date(results[i][3] * 1000);                                     
-                    $("#transaction").append("<tr>" + "<td>" + (i + 1) + "</td>" + "<td>" + code + "</td>" + "<td>" + timestamp + "</td>" + "</tr>");
-                }
-            },
-            error:function(xhr, status) {
-                    alert(status);
-            }  
-        })
-    </script>
 </body>
 
 </html>
