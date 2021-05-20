@@ -2,14 +2,14 @@ const LocalStrategy = require('passport-local').Strategy;
 const crypto = require('crypto');
 
 module.exports = new LocalStrategy({
-    usernameField:'id',
+    usernameField:'code',
     passwordField:'password',
     passReqToCallback:true
-}, (req, id, password, done) => {
-    console.log('passport의 local-login 호출됨 : ' + id + ', ' + password);
+}, (req, code, password, done) => {
+    console.log('passport의 local-login 호출됨 : ' + code + ', ' + password);
     
     const database = req.app.get('database'); 
-    authUser(id, database.pool, (err, user) => {
+    authUser(code, database.pool, (err, user) => {
         if(err) {
             console.log('로그인 중 에러 발생함');
             return done(err); // 상황에 맞춰서 인증결과를 authenticate 쪽으로 알려줌
@@ -35,7 +35,7 @@ module.exports = new LocalStrategy({
     });
 });
 
-const authUser = (id, pool, callback) => {
+const authUser = (code, pool, callback) => {
     console.log('authUser 함수 호출됨.');
 
     pool.getConnection((err, conn) => {
@@ -51,7 +51,7 @@ const authUser = (id, pool, callback) => {
         const columns = ['code', 'name', 'hashed_password', 'salt', 'department'];
         const tableName = 'users';
 
-        const exec = conn.query('select ?? from ?? where id = ?', [columns, tableName, id], (err, result) => {
+        const exec = conn.query('select ?? from ?? where code = ?', [columns, tableName, code], (err, result) => {
             conn.release();
             
             if (err) {
