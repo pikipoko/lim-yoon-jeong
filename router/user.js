@@ -1,4 +1,4 @@
-
+const attendance = require('./attendance');
 
 module.exports = (router, passport) => { // router는 app 객체를 인자로 받은 것
     console.log('user_passport 호출됨.');
@@ -40,7 +40,7 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
     });
 
     router.route('/userShow').get((req, res) => {
-        console.log('/user 패스로 GET 요청됨.');
+        console.log('/userShow 패스로 GET 요청됨.');
 
         const userSession = req.session.passport; 
         if (userSession) {
@@ -52,6 +52,26 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
             return;
         }
 
-        res.render('user.ejs');
+
+        res.render('user.ejs');     
+    })
+
+    router.route('/userShow').post(async(req, res) => {
+        console.log('/userShow 패스로 POST 요청됨.');
+
+        const userSession = req.session.passport; 
+        if (userSession) {
+            console.log('유저 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('유저 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+
+        const userCode = userSession.user.code;
+        const response = await attendance.getHistory(userCode);
+        res.json(response);
+        return;
     })
 }
