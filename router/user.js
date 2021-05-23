@@ -1,17 +1,11 @@
-
+const attendance = require('./attendance');
 
 module.exports = (router, passport) => { // router는 app 객체를 인자로 받은 것
     console.log('user_passport 호출됨.');
     
     //===== 회원가입과 로그인 라우팅 함수 =====//
-    router.route('/login').get((req, res) => {
-        console.log('/login 패스로 GET 요청됨.');
-
-        res.redirect('/public/login.html');
-    });
-
-    router.route('/login').post(passport.authenticate('local-login', {       
-        successRedirect: '/user',
+    router.route('/user').post(passport.authenticate('local-login', {       
+        successRedirect: '/userShow',
         failureRedirect: '/public/login.html',
         failureFlash: true
     }));
@@ -45,9 +39,39 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
         res.redirect('/');
     });
 
-    router.route('/user').get((req, res) => {
-        console.log('/user 패스로 GET 요청됨.');
+    router.route('/userShow').get((req, res) => {
+        console.log('/userShow 패스로 GET 요청됨.');
 
-        res.render('user.ejs');
+        const userSession = req.session.passport; 
+        if (userSession) {
+            console.log('유저 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('유저 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+
+
+        res.render('user.ejs');     
+    })
+
+    router.route('/userShow').post(async(req, res) => {
+        console.log('/userShow 패스로 POST 요청됨.');
+
+        const userSession = req.session.passport; 
+        if (userSession) {
+            console.log('유저 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('유저 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+
+        const userCode = userSession.user.code;
+        const response = await attendance.getHistory(userCode);
+        res.json(response);
+        return;
     })
 }
