@@ -9,6 +9,7 @@ module.exports = {
         {file:'./admin', path:'/admin/list', method:'list', type:'get'},
         {file:'./admin', path:'/admin/list/show/:userCode', method:'show', type:'get'},
         {file:'./admin', path:'/admin/list/show', method:'showHistory', type:'post'},
+        {file:'./admin', path:'/admin/logout', method:'logout', type:'get'},
         {file:'./attendance', path:'/process/submit', method:'submit', type:'post'},
         {file:'./attendance', path:'/process/list', method:'list', type:'post'},
         {file:'./faceRecognition', path:'/process/recognition', method:'recognition', type:'post'}

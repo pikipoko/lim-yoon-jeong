@@ -42,7 +42,7 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
     router.route('/userShow').get((req, res) => {
         console.log('/userShow 패스로 GET 요청됨.');
 
-        const userSession = req.session.passport; 
+        const userSession = req.user; 
         if (userSession) {
             console.log('유저 로그인 정보가 있습니다.');
         }
@@ -59,7 +59,7 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
     router.route('/userShow').post(async(req, res) => {
         console.log('/userShow 패스로 POST 요청됨.');
 
-        const userSession = req.session.passport; 
+        const userSession = req.user; 
         if (userSession) {
             console.log('유저 로그인 정보가 있습니다.');
         }
@@ -69,7 +69,7 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
             return;
         }
 
-        const userCode = userSession.user.code;
+        const userCode = userSession.code;
         const response = await attendance.getHistory(userCode);
         res.json(response);
         return;
