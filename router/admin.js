@@ -224,8 +224,21 @@ const showHistory = async (req, res) => {
     return;
 }
 
+const logout = async (req, res) => {
+    console.log('admin/logout 패스로 GET 요청됨.');
+
+    req.session.destroy(function(err){
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect('/');
+        }
+    })
+}
+
 module.exports.adminLogin = adminLogin;
 module.exports.admin = admin;
 module.exports.list = list;
 module.exports.show = show;
 module.exports.showHistory = showHistory;
+module.exports.logout = logout;
