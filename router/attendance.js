@@ -50,6 +50,7 @@ const submitHistory = async (userCode) => {
 
     let nonce;
 
+    /*
     const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
         if (error) {
         }
@@ -70,7 +71,7 @@ const submitHistory = async (userCode) => {
                     console.log('Successfully unsubscribed!');
             });
         });
-    });
+    });*/
 
     let historyNumber = await getHistoriesNumber();
     console.log(historyNumber + " -> " + userCode);
