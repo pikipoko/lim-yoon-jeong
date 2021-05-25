@@ -4,7 +4,7 @@ const contractAddress = etherConfig.contractAddress;
 const account = etherConfig.account;
 const Tx = require('ethereumjs-tx').Transaction;
 const Web3 = require('web3');
-const web3 = new Web3('https://ropsten.infura.io/v3/3c52917848e945229c0d33d632b10490');
+const web3 = new Web3(new Web3.providers.WebsocketProvider(etherConfig.endpoint));
 const privateKey = Buffer.from(etherConfig.privateKey, 'hex');
 const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
@@ -30,11 +30,47 @@ const getHistory = async (userCode) => {
         return response;
 }
 
-const submit = async (req, res) => {
-    console.log('/process/submit으로 POST 요청됨.');
+const getHistoriesNumber = async () => {
+    console.log("인증 이력 개수 조회를 위한 메서드 호출됨.");
 
-    const userCode = req.body.userCode;
+    let result;
+    await contract.methods.getNumOfHistories().call()
+        .then(length => {
+            console.log("Value before increment: " + length);
+            result = length
+        })
+    return result;
+}
+
+
+const submitHistory = async (userCode) => {
+    console.log('인증 이력 저장 메서드 호출됨.');
+
     console.log("userCode : " + userCode);
+
+    let nonce;
+
+    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
+        if (error) {
+        }
+    }).on("data", function (transaction) {
+        console.log("Transaction hash: " + transaction);
+        web3.eth.getTransaction(transaction).then(object => {
+            if (object.from == account) {
+                console.log(object);
+                nonce = object.nonce;
+            }
+            else {
+                web3.eth.getTransactionCount(account, "pending").then(_nonce => {
+                    nonce = web3.utils.toHex(_nonce)
+                })
+            }
+            subscription.unsubscribe(function(error, success){
+                if(success)
+                    console.log('Successfully unsubscribed!');
+            });
+        });
+    });
 
     let historyNumber = await getHistoriesNumber();
     console.log(historyNumber + " -> " + userCode);
@@ -74,18 +110,6 @@ const submit = async (req, res) => {
     })  // web3.eth.getTransactionCount
 }
 
-const getHistoriesNumber = async () => {
-    console.log("인증 이력 개수 조회를 위한 메서드 호출됨.");
-
-    let result;
-    await contract.methods.getNumOfHistories().call()
-        .then(length => {
-            console.log("Value before increment: " + length);
-            result = length
-        })
-    return result;
-}
-
 const test = {};
 
 test.send = (data) => {
@@ -97,5 +121,5 @@ test.send = (data) => {
 module.exports = test;
 
 module.exports.list = list;
-module.exports.submit = submit;
+module.exports.submitHistory = submitHistory;
 module.exports.getHistory = getHistory;

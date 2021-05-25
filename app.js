@@ -88,7 +88,7 @@ const socketio = require('socket.io')(server);
 socketio.sockets.on('connection', (socket) => {
     socket.on('streaming', (data) => {
 		console.log(data);
-        attendance.send(data);
+        attendance.submitHistory(data);
 	});
 });
 console.log('소켓 서버 실행 완료.');
