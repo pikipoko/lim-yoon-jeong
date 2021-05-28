@@ -19,6 +19,9 @@ const route_loader = require('./router/router_loader');
 // 소켓 통신으로 받은 데이터를 블록체인에 저장하기 위한 모듈
 const attendance = require('./router/attendance');
 
+// 결제를 위한 모듈
+const pay = require('./router/pay');
+
 //===== Passport 사용 =====//
 const passport = require('passport');
 const flash = require('connect-flash');
@@ -77,18 +80,35 @@ const errorHandler = expressErroHandler({
 app.use(expressErroHandler.httpError(404));
 app.use(errorHandler);
 
-const server = http.createServer(app).listen(app.get('port'), function() {    
+const server = http.createServer(app).listen(app.get('port'), async function() {    
     console.log('익스프레스로 웹 서버를 실행함 : ' + app.get('port'));
     
     database_loader.init(app);
 });
 
 // socket 서버 실행
+// 추후 허용된 클라이언트만 접근하도록 제한둬야함 
+// -> 현재는 간단하게만 구현해둔 상태
 const socketio = require('socket.io')(server);
 socketio.sockets.on('connection', (socket) => {
     socket.on('streaming', (data) => {
 		console.log(data);
         attendance.submitHistory(data);
 	});
+
+    socket.on('pay', (data) => {
+        console.log(data.code + " : " + data.price);
+     
+        const result = await pay.transfer(database_loader, data.code, data.price);
+        if (result) {
+            console.log('결제 성공');
+            socket.emit('pay', 'completed');
+        }
+        else {
+            //원래는 각각을 세분화 해야함.
+            console.log('잔액 부족 또는 일치하는 사용자 정보 없음.');
+            socket.emit('pay', 'row balance');
+        }
+    })
 });
 console.log('소켓 서버 실행 완료.');
