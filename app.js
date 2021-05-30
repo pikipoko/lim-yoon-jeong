@@ -96,7 +96,7 @@ socketio.sockets.on('connection', (socket) => {
         attendance.submitHistory(data);
 	});
 
-    socket.on('pay', (data) => {
+    socket.on('pay', async (data) => {
         console.log(data.code + " : " + data.price);
      
         const result = await pay.transfer(database_loader, data.code, data.price);
