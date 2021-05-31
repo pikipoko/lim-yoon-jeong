@@ -55,21 +55,6 @@ const addUser = async (code, name, password, department, pool, callback) => {
         console.log('데이터베이스 연결 객체 오류 : ' + err);
         callback(err, null);
     }
-    
-    pool.getConnection((err, conn) => {
-        const exec = conn.query('insert into users set ?', data, (err, result) => {
-            conn.release();
-            
-            if (err) {
-                console.log('sql 실행 중 오류 발생');
-                console.dir(err);
-
-                callback(err, null);
-            }
-
-            callback(null, result);
-        })
-    })
 }
 
 const makeSalt = () => {
