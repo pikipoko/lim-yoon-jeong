@@ -35,41 +35,35 @@ module.exports = new LocalStrategy({
     });
 });
 
-const authUser = (code, pool, callback) => {
+const authUser = async (code, pool, callback) => {
     console.log('authUser 함수 호출됨.');
 
-    pool.getConnection((err, conn) => {
-        if (err) {
-            console.log('커넥션 풀에서 데이터 베이스 연결 객체 가져오는 중 에러 발생.');
-            console.log(err);
-            if (conn) {
-                conn.release();
+    try {
+        const conn = await pool.getConnection(async(conn) => conn);
+        try {
+            const columns = ['code', 'name', 'hashed_password', 'salt', 'department'];
+            const tableName = 'users';
+            const [row] = await conn.query('select ?? from ?? where code = ?', [columns, tableName, code]);
+            conn.release();
+            if (row.length > 0) {
+                console.log('일치하는 사용자 찾음.');
+                callback(null, row);
             }
+            else {
+                console.log('일치하는 사용자가 존재하지 않음.');
+                callback(null, null);       
+            }
+            
+        } catch (err) {
+            conn.release();
+            console.log('사용자 조회 중 오류 : ' + err);
             callback(err, null);
         }
-
-        const columns = ['code', 'name', 'hashed_password', 'salt', 'department'];
-        const tableName = 'users';
-
-        const exec = conn.query('select ?? from ?? where code = ?', [columns, tableName, code], (err, result) => {
-            conn.release();
-            
-            if (err) {
-                console.log('sql 실행 중 오류 발생');
-                console.dir(err);
-
-                callback(err, null);
-            }
-
-            if (result.length > 0) {
-                console.log('일치하는 사용자 찾음.');
-                callback(null, result);
-            } else {
-                console.log('일치하는 사용자가 존재하지 않음.');
-                callback(null, null);
-            }
-        })
-    })
+        
+    } catch (err) {
+        console.log('데이터베이스 연결 객체 오류 : ' + err);
+        callback(err, null);
+    }
 }
 
 const authenticate = (password, salt, hashed_password) => {

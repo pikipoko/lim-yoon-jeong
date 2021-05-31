@@ -34,7 +34,7 @@ const admin = (req, res) => {
     res.render('program');
 }
 
-const list = (req, res) => {
+const list = async (req, res) => {
     console.log('admin/list 패스로 GET 요청됨.');
 
     const adminSession = req.session.admin;
@@ -49,33 +49,17 @@ const list = (req, res) => {
     }
 
     const database = req.app.get('database'); 
-    database.pool.getConnection((err, conn) => {
-        if (err) {
-            console.log('커넥션 풀에서 데이터 베이스 연결 객체 가져오는 중 에러 발생.');
-            console.log(err);
-            if (conn) {
-                conn.release();
-            }
-            throw err;
-        }
-
-        const columns = ['code', 'name', 'department'];
-        const tableName = 'users';
-
-        const exec = conn.query('select ?? from ??', [columns, tableName], (err, results) => {
+    try {
+        const conn = await database.pool.getConnection(async(conn) => conn);
+        try {
+            const columns = ['code', 'name', 'department'];
+            const tableName = 'users';
+            const [row] = await conn.query('select ?? from ??', [columns, tableName]);
             conn.release();
-            
-            if (err) {
-                console.log('sql 실행 중 오류 발생');
-                console.dir(err);
-
-                //callback(err, null);
-            }
-
-            if (results) {
-                console.log(results);
+            if (row) {
+                //console.log(row);
                 var context = {
-                    results:results
+                    results:row
                 };
                 req.app.render('list', context, function(err, html) {
                     if(err) {
@@ -92,14 +76,22 @@ const list = (req, res) => {
                     res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
                     res.end(html);
                 });              
-            } else {
+            }
+            else {
                 console.log('에러 발생.');
                 res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
                 res.write('<h1>검색 실패.</h1>');
                 res.end();
             }
-        })
-    })
+            
+        } catch (err) {
+            conn.release();
+            console.log('사용자 조회 중 오류 : ' + err);
+        }
+        
+    } catch (err) {
+        console.log('데이터베이스 연결 객체 오류 : ' + err);
+    }
 }
 
 /*

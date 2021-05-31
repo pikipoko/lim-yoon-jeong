@@ -27,27 +27,36 @@ module.exports = new LocalStrategy({
     });
 });
 
-const addUser = (code, name, password, department, pool, callback) => {
+const addUser = async (code, name, password, department, pool, callback) => {
     console.log('addUser 함수 호출됨.');
 
-    pool.getConnection((err, conn) => {
-        if (err) {
-            if (conn) {
-                conn.release();
-            }
-
+    try {
+        const conn = await pool.getConnection(async(conn) => conn);
+        try {
+            salt = makeSalt();
+            const data = {
+                code: code,
+                name: name,
+                hashed_password: encryptPassword(password, salt),
+                salt: salt,
+                department: department,
+            };
+            const [row] = await conn.query('insert into users set ?', data);
+            conn.release();
+            callback(null, row);
+            
+        } catch (err) {
+            conn.release();
+            console.log('사용자 조회 중 오류 : ' + err);
             callback(err, null);
         }
-
-        salt = makeSalt();
-        const data = {
-            code: code,
-            name: name,
-            hashed_password: encryptPassword(password, salt),
-            salt: salt,
-            department: department,
-        };
-
+        
+    } catch (err) {
+        console.log('데이터베이스 연결 객체 오류 : ' + err);
+        callback(err, null);
+    }
+    
+    pool.getConnection((err, conn) => {
         const exec = conn.query('insert into users set ?', data, (err, result) => {
             conn.release();
             

@@ -89,14 +89,17 @@ const getUserInfo = async (database, code) => {
             const [row] = await conn.query('select ?? from ?? where code = ?', [columns, tableName, code]);
             if (row[0]) {
                 console.log(row[0]);
+                conn.release();
                 return row[0];
             }
             else {
                 console.log('일치하는 정보가 없습니다.');
+                conn.release();
                 return null;
             }
             
         } catch (err) {
+            conn.release();
             console.log('사용자 조회 중 오류 : ' + err);
         }
         
