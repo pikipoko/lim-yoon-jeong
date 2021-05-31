@@ -51,7 +51,7 @@
                         
                         <div class="sb-sidenav-menu-heading">menu</div>
                        
-                        <a style="background-color: #00227b;" class="nav-link a-hover" href="#">
+                        <a style="background-color: #00227b;" class="nav-link a-hover" href="/userShow">
                             <div class="sb-nav-link-icon"><i class="fas fa-user-friends"></i></div>
                             본인 인증이력
                         </a>
@@ -70,55 +70,25 @@
             <main>
                 <div class="container-fluid">
                     <div class="flex">
-                        <h3 class="mt-4"><strong>본인 인증이력</strong></h3>
-                        <form action="#">
-                            <a href="/user/addInfo"><input id="input-tag" type="button" value="추가"
-                                    class="btn-secondary"></a>
+                        <h3 class="mt-4"><strong>개인정보 추가</strong></h3>
+                    </div>
+                    <ol class="breadcrumb mb-4">
+                        <form method="post" action="/user/addInfo">
+                            <div class="create">
+                                <i class="fas fa-star"></i>
+                                ACCOUNT<br>
+                                <input type="text" name="account"><br>
+                            </div>
+                            <div class="create">
+                                <i class="fas fa-star"></i>
+                                PRIVATE_KEY<br>
+                                <input type="password" name="password">
+                            </div>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<button class="submit">저장</button>
                         </form>
-                    </div>
-                    
-                    <div class="table-whole table-responsive metable" style="background-color: #fff;">
-                        <table class="table table-xl">
-                            <thead>
-                                <tr class="table-setting table table-light">
-                                    <td class="td-metable">순번</td>
-                                    <td class="td-metable">날짜</td>
-                                </tr>
-                            </thead>
-                            <tbody id="transaction">
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- pagination -->
-                    <nav aria-label="Page navigation example" class="pagination justify-content-center">
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item">
-                                <a class="my-page page-link" href="#" aria-label="Previous" style="font-weight: bold;">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item"><a class="my-page page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">6</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">7</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">8</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">9</a></li>
-                            <li class="page-item"><a class="my-page page-link" href="#">10</a></li>
-                            <li class="page-item">
-                                <a class="my-page page-link" href="#" aria-label="Next" style="font-weight: bold;">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-
+                    </ol>
                 </div>
-            </main>
-            
+            </main>    
         </div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
@@ -129,21 +99,6 @@
     <script src="assets/demo/chart-area-demo.js"></script>
     <script src="assets/demo/chart-bar-demo.js"></script>
     <script src="assets/demo/chart-pie-demo.js"></script>
-    <script>  
-        $.ajax({
-            url:'/userShow',
-            type : 'POST',
-            success:function(results){
-                for(let i=0; i<results.getList.length; i++) {
-                    let timestamp = new Date(results.getList[i] * 1000);                                     
-                    $("#transaction").append("<tr>" + "<td>" + (i + 1) + "</td>" + "<td>" + timestamp + "</td>" + "</tr>");
-                }
-            },
-            error:function(xhr, status) {
-                    alert(status);
-            }  
-        })
-    </script>
 </body>
 
 </html>

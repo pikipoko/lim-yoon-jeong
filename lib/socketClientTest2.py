@@ -7,7 +7,7 @@ sio = socketio.Client()
 sio.connect('http://127.0.0.1:3300')
 
 global data
-data = {'code':'00001', 'price':'4000'}
+data = {'code':'A00001', 'price':'4000'}
 
 
 isFinish = True
@@ -17,7 +17,7 @@ def dd(data1):
     print('1', data1)
     #isFinish = False
 
-for i in range(3):
+for i in range(2):
     sio.on('pay', dd)
     print(data)
     sio.emit('pay', data)

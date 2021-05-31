@@ -6,6 +6,7 @@ const Tx = require('ethereumjs-tx').Transaction;
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider(etherPayConfig.endpoint));
 const contract = new web3.eth.Contract(contractPayAbi, contractAddress);
+const apiCrypto = require('./apiCrypto');
 
 // 해당 사람의 잔액 조회
 const getBalance = async (fromAccount) => {
@@ -34,8 +35,8 @@ const transfer = async (database, code, price) => {
     }
     console.log("user : " + userInfo);
     const fromAccount = userInfo.account;
-    const privateKey = Buffer.from(userInfo.private_key, 'hex');
-    console.log(privateKey);
+    const decryptPrivateKey = apiCrypto.decrypt(userInfo.private_key);
+    const privateKey = Buffer.from(decryptPrivateKey, 'hex');
     
     const balance = await getBalance(fromAccount);
     console.log(balance);

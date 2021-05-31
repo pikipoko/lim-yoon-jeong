@@ -1,4 +1,5 @@
 const attendance = require('./attendance');
+const apiCrypto = require('./apiCrypto');
 
 module.exports = (router, passport) => { // router는 app 객체를 인자로 받은 것
     console.log('user_passport 호출됨.');
@@ -52,7 +53,6 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
             return;
         }
 
-
         res.render('user.ejs');     
     })
 
@@ -74,4 +74,58 @@ module.exports = (router, passport) => { // router는 app 객체를 인자로 �
         res.json(response);
         return;
     })
+
+    router.route('/user/addInfo').get((req, res) => {
+        console.log('/user/addInfo 패스로 GET 요청됨.');
+
+        const userSession = req.user; 
+        if (userSession) {
+            console.log('유저 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('유저 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+        res.render('addUserInfo.ejs');
+        return;
+    });
+
+    router.route('/user/addInfo').post(async(req, res) => {
+        console.log('/user/addInfo 패스로 POST 요청됨.');
+
+        const userSession = req.user; 
+        if (userSession) {
+            console.log('유저 로그인 정보가 있습니다.');
+        }
+        else {
+            console.log('유저 로그인 정보가 없습니다.');
+            res.redirect('/public/login.html');
+            return;
+        }
+
+        const paramAccount = req.body.account || req.query.account;
+        const paramPassword = req.body.password || req.query.password;
+        console.log(paramAccount + ' : ' + paramPassword + ' -> ' + userSession.code);
+
+        const database = req.app.get('database');
+        try {
+            const conn = await database.pool.getConnection(async(conn) => conn);
+            try {
+                const account = paramAccount;
+                const private_key = apiCrypto.encrypt(paramPassword);
+
+                const [row] = await conn.query('update users set account =?, private_key =? where code =?', [account, private_key, userSession.code]);
+                conn.release();
+                
+            } catch (err) {
+                conn.release();
+                console.log('사용자 정보 업데이트 중 오류 : ' + err);
+            }
+            
+        } catch (err) {
+            console.log('데이터베이스 연결 객체 오류 : ' + err);
+        }
+        res.redirect('/userShow');
+    });
 }
