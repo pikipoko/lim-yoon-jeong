@@ -48,31 +48,6 @@ const submitHistory = async (userCode) => {
 
     console.log("userCode : " + userCode);
 
-    let nonce;
-
-    /*
-    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
-        if (error) {
-        }
-    }).on("data", function (transaction) {
-        console.log("Transaction hash: " + transaction);
-        web3.eth.getTransaction(transaction).then(object => {
-            if (object.from == account) {
-                console.log(object);
-                nonce = object.nonce;
-            }
-            else {
-                web3.eth.getTransactionCount(account, "pending").then(_nonce => {
-                    nonce = web3.utils.toHex(_nonce)
-                })
-            }
-            subscription.unsubscribe(function(error, success){
-                if(success)
-                    console.log('Successfully unsubscribed!');
-            });
-        });
-    });*/
-
     let historyNumber = await getHistoriesNumber();
     console.log(historyNumber + " -> " + userCode);
     const contractFunction = contract.methods.addHistory(userCode);
@@ -92,7 +67,8 @@ const submitHistory = async (userCode) => {
         tx.sign(privateKey)
         serializedTx = tx.serialize()
 
-        web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+        try {
+            web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
             .on('receipt', receipt => {
                 console.log("receipt :", receipt);
                 contract.methods.getNumOfHistories().call()
@@ -108,6 +84,9 @@ const submitHistory = async (userCode) => {
                 //res.status(200).json(response);
                 console.log('response : ' + response.data);
             })   // end of on('receipt')
+        } catch (err) {
+            console.log('가스 비용 부족 : ' + err);
+        }
     })  // web3.eth.getTransactionCount
 }
 
