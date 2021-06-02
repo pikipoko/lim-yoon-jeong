@@ -7,7 +7,7 @@ sio = socketio.Client()
 sio.connect('http://127.0.0.1:3300')
 
 global name
-name = "A00001"
+name = "K00001"
 
 while True: 
     time.sleep(0.1)

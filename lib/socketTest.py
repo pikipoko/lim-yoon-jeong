@@ -11,8 +11,8 @@ name = "test01"
 
 while True: 
     time.sleep(0.1)
-    if (name != "A00001"):
-        name = "A00001"
+    if (name != "K00001"):
+        name = "K00001"
     else:
         continue
     sio.emit('streaming', name)
