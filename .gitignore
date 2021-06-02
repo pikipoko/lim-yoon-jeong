@@ -2,6 +2,8 @@ node_modules
 package-lock.json
 config/etherConfig.js
 config/etherPayConfig.js
+config/etherIdentifyConfig.js
 lib/model
 lib/encodings.pickle
+lib/encodings_ago.pickle
 .env

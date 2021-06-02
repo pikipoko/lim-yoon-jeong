@@ -7,6 +7,7 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider(etherConfig.endpoint));
 const privateKey = Buffer.from(etherConfig.privateKey, 'hex');
 const contract = new web3.eth.Contract(contractAbi, contractAddress);
+const identifyInfo = require('./indentifyInfo');
 
 const list = (req, res) => {
     console.log('/process/list로 POST 요청됨.');
@@ -43,13 +44,19 @@ const getHistoriesNumber = async () => {
 }
 
 
-const submitHistory = async (userCode) => {
+const submitHistory = async (userCode, hashValue) => {
     console.log('인증 이력 저장 메서드 호출됨.');
 
-    console.log("userCode : " + userCode);
+    console.log("userCode : " + userCode + ", hashValue : " + hashValue);
 
-    let historyNumber = await getHistoriesNumber();
-    console.log(historyNumber + " -> " + userCode);
+    // 실전에서는 각 userCode에 해당하는 해쉬값을 가져와야 하지만 테스트용으로 전체 데이터에 대한 해쉬값 가져옴(키값: 관리자)
+    const savedHashValue = await identifyInfo.getIdentifyInfo('admin');
+    console.log(savedHashValue.getList + " : " + hashValue);
+    if (savedHashValue.getList != hashValue) {
+        console.log('해쉬값 불일치 인증정보 위변조 탐지');
+        return false;
+    }
+
     const contractFunction = contract.methods.addHistory(userCode);
     const functionAbi = contractFunction.encodeABI();
 
@@ -88,6 +95,8 @@ const submitHistory = async (userCode) => {
             console.log('가스 비용 부족 : ' + err);
         }
     })  // web3.eth.getTransactionCount
+
+    return true;
 }
 
 const test = {};

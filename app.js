@@ -91,9 +91,17 @@ const server = http.createServer(app).listen(app.get('port'), async function() {
 // -> 현재는 간단하게만 구현해둔 상태
 const socketio = require('socket.io')(server);
 socketio.sockets.on('connection', (socket) => {
-    socket.on('streaming', (data) => {
-		console.log(data);
-        attendance.submitHistory(data);
+    socket.on('streaming', async (data) => {
+		console.log(data.code + " : " + data.hashValue);
+        const result = await attendance.submitHistory(data.code, data.hashValue);
+        if (result) {
+            console.log('검증 성공');
+            socket.emit('streaming', 'completed');
+        }
+        else {
+            console.log('데이터 위변조 탐지 -> 검증 실패');
+            socket.emit('streaming', 'not allowed');
+        }
 	});
 
     socket.on('pay', async (data) => {
