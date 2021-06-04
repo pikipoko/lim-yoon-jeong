@@ -7,7 +7,7 @@ import cv2
 import socketio
 
 sio = socketio.Client()
-sio.connect('http://127.0.0.1:3300')
+sio.connect('http://54.180.147.167:3300/')
 
 encoding_file = './encodings.pickle'
 
@@ -86,7 +86,12 @@ def detectAndDisplay(image):
 
             unknown_check = True
 
+
+
             name = max(counts, key=counts.get)
+
+            if counts[name] < 3 :
+                name = "unknown_name"
 
         if unknown_check == False:
             names.append("unknown_name")
@@ -136,6 +141,7 @@ def detectAndDisplay(image):
 data = pickle.loads(open(encoding_file, "rb").read())
 
 cap = cv2.VideoCapture(0)
+
 
 while True:
 
@@ -223,6 +229,7 @@ while True:
             (startX, endX, startY, endY) = getCropDimension(rect, eyes_center)
             croped = warped[startY:endY, startX:endX]
 
+            print(OUTPUT_SIZE)
             try:
                 output = cv2.resize(croped, OUTPUT_SIZE, cv2.INTER_AREA)
             except Exception as e:
