@@ -419,13 +419,36 @@ class video(QObject):
 
         if name != '':
             print('얼굴 인식됨.')
-            self.widget.labelCode.setText('식별 코드 : ' + name)
-            self.widget.labelCode.repaint()
-            time.sleep(0.5)
+            #self.widget.labelCode.setText('식별 코드 : ' + name)
+            #self.widget.labelCode.repaint()
+            #time.sleep(0.5)
             pre_name = name
 
             # 한번 인식하면 잠깐 인식 멈추기
             self.widget.isNeedDetection = False
+
+            # 소켓 서버에 인증 결과 전송
+            hashcode = hashlib.sha256(str(data).encode()).hexdigest()
+            personInfo = {'name': name, 'hashcode': hashcode}
+            self.isProcessingPay = True
+            sio.emit('identifyForPay', personInfo)
+
+            while self.isProcessingPay:
+                sio.on('identifyForPay', self.finish)
+
+            #time.sleep(0.5)
+            pre_name = name
+
+    def finish(self, result):
+        self.isProcessingPay = False
+        if result == 'completed':
+            print('인증 및 검증 성공')
+            self.widget.labelCode.setText('식별 코드 : ' + name)
+            self.widget.labelCode.repaint()
+        else:
+            print('데이터 위변조 탐지')
+            self.widget.labelCode.setText('식별 코드 : 위변조 탐지')
+            self.widget.labelCode.repaint()
 
 
 if __name__ == '__main__':

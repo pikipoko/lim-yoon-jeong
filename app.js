@@ -20,6 +20,7 @@ const route_loader = require('./router/router_loader');
 const attendance = require('./router/attendance');
 
 // 결제를 위한 모듈
+const identifyInfo = require('./indentifyInfo');
 const pay = require('./router/pay');
 
 //===== Passport 사용 =====//
@@ -104,9 +105,22 @@ socketio.sockets.on('connection', (socket) => {
         }
 	});
 
+    socket.on('identifyForPay', async (data) => {
+		console.log(data.name + " : " + data.hashcode);
+        const savedHashValue = await identifyInfo.getIdentifyInfo('admin');
+        console.log(savedHashValue.getList + " : " + hashValue);
+        if (savedHashValue.getList == hashValue) {
+            console.log('검증 성공');
+            socket.emit('identifyForPay', 'completed');
+        }
+        else {
+            console.log('해쉬값 불일치 인증정보 위변조 탐지');
+            socket.emit('identifyForPay', 'not allowed');
+        }
+	});
+
     socket.on('pay', async (data) => {
         console.log(data.code + " : " + data.price);
-     
         const result = await pay.transfer(database_loader, data.code, data.price);
         if (result) {
             console.log('결제 성공');
