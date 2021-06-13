@@ -10,6 +10,7 @@ from threading import Thread
 import time
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import hashlib
 
 sio = socketio.Client()
 sio.connect('http://127.0.0.1:3300')
