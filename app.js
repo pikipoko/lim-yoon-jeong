@@ -108,8 +108,8 @@ socketio.sockets.on('connection', (socket) => {
     socket.on('identifyForPay', async (data) => {
 		console.log(data.name + " : " + data.hashcode);
         const savedHashValue = await identifyInfo.getIdentifyInfo('admin');
-        console.log(savedHashValue.getList + " : " + hashValue);
-        if (savedHashValue.getList == hashValue) {
+        console.log(savedHashValue.getList + " : " + data.hashcode);
+        if (savedHashValue.getList == data.hashcode) {
             console.log('검증 성공');
             socket.emit('identifyForPay', 'completed');
         }
