@@ -20,7 +20,7 @@ const route_loader = require('./router/router_loader');
 const attendance = require('./router/attendance');
 
 // 결제를 위한 모듈
-const identifyInfo = require('./indentifyInfo');
+const identifyInfo = require('./router/indentifyInfo');
 const pay = require('./router/pay');
 
 //===== Passport 사용 =====//
