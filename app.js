@@ -92,8 +92,8 @@ const server = http.createServer(app).listen(app.get('port'), async function() {
 const socketio = require('socket.io')(server);
 socketio.sockets.on('connection', (socket) => {
     socket.on('streaming', async (data) => {
-		console.log(data.code + " : " + data.hashValue);
-        const result = await attendance.submitHistory(data.code, data.hashValue);
+		console.log(data.name + " : " + data.hashcode);
+        const result = await attendance.submitHistory(data.name, data.hashcode);
         if (result) {
             console.log('검증 성공');
             socket.emit('streaming', 'completed');

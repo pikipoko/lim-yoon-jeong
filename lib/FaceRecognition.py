@@ -5,6 +5,7 @@ import dlib
 import numpy as np
 import cv2
 import socketio
+import hashlib
 
 sio = socketio.Client()
 sio.connect('http://54.180.147.167:3300/')
@@ -30,6 +31,8 @@ predictor = dlib.shape_predictor(predictor_file)
 # 전역 변수 테스트
 name = ''
 pre_name =''
+isProcessingPay = True
+isNeedDetection = True
 
 
 # 사진 짜르기 메소드
@@ -50,7 +53,7 @@ def getCropDimension(rect, center):
 
 # 얼굴인식후 표시 메소드
 def detectAndDisplay(image):
-    global name, pre_name
+    global name, pre_name, isProcessingPay
     unknown_check = False
 
     start_time = time.time()
@@ -129,19 +132,31 @@ def detectAndDisplay(image):
 
     if name != '':
         # 소켓 서버에 인증 결과 전송
-        sio.emit('streaming', name)
-        time.sleep(0.5)
+        hashcode = hashlib.sha256(str(data).encode()).hexdigest()
+        personInfo = {'name': name, 'hashcode': hashcode}
+        isProcessingPay = True
+        isNeedDetection = False
+        sio.emit('streaming', personInfo)
+
+        while isProcessingPay:
+            sio.on('pay', finish)
+
+        #time.sleep(0.5)
         pre_name = name
 
-
-
-
+def finish(self, result):
+    print(result)
+    isProcessingPay = False
+    isNeedDetection = True
+    if result == 'completed':
+        print('인증 성공')
+    else:
+        print('데이터 위변조 탐지')
 
 # load the known faces and embeddings
 data = pickle.loads(open(encoding_file, "rb").read())
 
 cap = cv2.VideoCapture(0)
-
 
 while True:
 
@@ -195,18 +210,6 @@ while True:
             right_eye_center = np.mean(points[RIGHT_EYE], axis=0).astype("int")
             left_eye_center = np.mean(points[LEFT_EYE], axis=0).astype("int")
 
-            # cv2.circle(image, (right_eye_center[0, 0], right_eye_center[0, 1]), 5, (0, 0, 255), -1)
-            # cv2.circle(image, (left_eye_center[0, 0], left_eye_center[0, 1]), 5, (0, 0, 255), -1)
-            #
-            # cv2.circle(image, (left_eye_center[0, 0], right_eye_center[0, 1]), 5, (0, 255, 0), -1)
-            #
-            # cv2.line(image, (right_eye_center[0, 0], right_eye_center[0, 1]),
-            #          (left_eye_center[0, 0], left_eye_center[0, 1]), (0, 255, 0), 2)
-            # cv2.line(image, (right_eye_center[0, 0], right_eye_center[0, 1]),
-            #          (left_eye_center[0, 0], right_eye_center[0, 1]), (0, 255, 0), 1)
-            # cv2.line(image, (left_eye_center[0, 0], right_eye_center[0, 1]),
-            #          (left_eye_center[0, 0], left_eye_center[0, 1]), (0, 255, 0), 1)
-
             eye_delta_x = right_eye_center[0, 0] - left_eye_center[0, 0]
             eye_delta_y = right_eye_center[0, 1] - left_eye_center[0, 1]
             degree = np.degrees(np.arctan2(eye_delta_y, eye_delta_x)) - 180
@@ -217,7 +220,6 @@ while True:
 
             eyes_center = ((left_eye_center[0, 0] + right_eye_center[0, 0]) // 2,
                            (left_eye_center[0, 1] + right_eye_center[0, 1]) // 2)
-            # cv2.circle(image, eyes_center, 5, (255, 0, 0), -1)
 
             metrix = cv2.getRotationMatrix2D(eyes_center, degree, scale)
             cv2.putText(image, "{:.5f}".format(degree), (right_eye_center[0, 0], right_eye_center[0, 1] + 20),
@@ -237,7 +239,8 @@ while True:
 
             # 전처리한 Input Data 얼굴인식
             try:
-                detectAndDisplay(output)
+                if isNeedDetection:
+                    detectAndDisplay(output)
             except Exception as e:
                 print(str(e))
 

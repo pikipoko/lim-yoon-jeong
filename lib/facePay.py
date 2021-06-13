@@ -146,15 +146,13 @@ class MyApp(QWidget):
                     return
 
             # 소켓 서버에 인증 결과 전송
-            print('전송 간다.')
             payInfo = {'code': code, 'price': price}
             self.isProcessingPay = True
             sio.emit('pay', payInfo)
-            while self.isProcessingPay:
-                print('1')
-                sio.on('pay', self.finish)
 
-            print('완전 끝')
+            while self.isProcessingPay:
+                sio.on('pay', self.finish)
+                
         else:
             self.btnPay.setText('결제하기')
             self.initTotalPrice()
