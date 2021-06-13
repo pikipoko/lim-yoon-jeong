@@ -36,14 +36,3 @@ while isFinish:
     sio.emit('streaming', data)
 
 sio.disconnect()
-
-#json.dumps(data, separators=(',', ':'), sort_keys=True).encode()
-#encoded = json.dumps(data["names"], sort_keys=True).encode()
-
-#encoded = json.dumps(data["encodings"].decode('utf8'), sort_keys=True).encode()
-
-#print(hashlib.sha256(str(data["encodings"]).encode()).hexdigest())
-
-#print(hashlib.sha256(encoded).hexdigest())
-
-#print(data["encodings"][0])
