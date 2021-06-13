@@ -146,7 +146,7 @@ def detectAndDisplay(image):
         #time.sleep(0.5)
         pre_name = name
 
-def finish(self, result):
+def finish(result):
     global isProcessingPay, isNeedDetection
     isProcessingPay = False
     isNeedDetection = True
