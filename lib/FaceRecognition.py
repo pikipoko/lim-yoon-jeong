@@ -135,17 +135,19 @@ def detectAndDisplay(image):
         hashcode = hashlib.sha256(str(data).encode()).hexdigest()
         personInfo = {'name': name, 'hashcode': hashcode}
         isProcessingPay = True
+
+        global isNeedDetection
         isNeedDetection = False
         sio.emit('streaming', personInfo)
 
         while isProcessingPay:
-            sio.on('pay', finish)
+            sio.on('streaming', finish)
 
         #time.sleep(0.5)
         pre_name = name
 
 def finish(self, result):
-    print(result)
+    global isProcessingPay, isNeedDetection
     isProcessingPay = False
     isNeedDetection = True
     if result == 'completed':
