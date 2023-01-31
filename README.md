@@ -56,3 +56,5 @@
     * 약속된 단체 내에 식당, 카페와 같은 곳에서 결제 시 사용할 수 있다.
     * 결제내역은 메타마스크 및 이더스캔에서 확인가능하다.
 
+![image](https://user-images.githubusercontent.com/59064298/215687367-b58d46d3-95b0-48d5-9dc5-4c600bbb4e53.png)
+
